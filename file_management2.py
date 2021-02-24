@@ -3,6 +3,29 @@ import time
 import utility_functions as UF
 import json
 
+def change_CWD(FILE_PATH):
+	"""
+	Will change the current directory into the directory where the files that will be sorted are.
+	Will return True for succesfull changing of CWD
+	Will reutnr False for failed chaning of CWD
+	"""
+	current_dir=os.getcwd()# get current directory
+	last_path=current_dir# to go 
+	dir_level=len(current_dir.split("/"))-2 #We need to reach the user root level
+	for i in range(dir_level):
+		os.chdir("..")
+	current_dir=os.getcwd()
+	path=os.path.join(current_dir,FILE_PATH) #combine the Current directory with t he parameter passed in funciton
+	#Now we check if its a valid path
+	try:
+		os.chdir(path)
+	except : #IF path is not valid change path to last path and return false
+		os.chdir(last_path)
+		current_dir=os.getcwd()
+		return False
+	return True # if no error occurs then it will return True
+Testing
+#print(change_CWD("/home/hamza/Desktop/Hello2314"))
 
 def setup_duplicate_folder():
     """
