@@ -40,11 +40,11 @@ def file_creation_date(file_path):
     date = subprocess_output(run_command(["stat", file_path], PIPE, PIPE)).strip('\\n').split(" ")[-5]
     year = date[:4]
     month = date[5:7]
-    day = date[9:11]
+    day = date[8:11]
     return [month, day, year]
 
 
 
 # print(file_creation_date('/home/iqra/Documents/python-projects/file-sort/sorter.py'))
 # print(subprocess_output(run_command(["stat", '/home/iqra/Documents/python-projects/file-sort/sorter.py'], PIPE, PIPE)).strip('\\n').split(" ")[-5])
-print(file_creation_date('/home/iqra/Documents/python-projects/file-sort/sorter.py'))
+print(file_creation_date('/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/2020_Book_ArtificialIntelligenceXXXVII (4th copy).pdf')[0])

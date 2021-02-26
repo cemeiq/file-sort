@@ -2,6 +2,8 @@ import os
 import time
 import utility_functions as UF
 import json
+import subprocess
+from subprocess import PIPE
 
 
 def setup_duplicate_folder():
@@ -9,9 +11,97 @@ def setup_duplicate_folder():
     This function will setup the duplicates folder
     :return: None
     """
-    UF.run_command(["mkdir", "./Duplicates/Keep"], PIPE, PIPE)
-    UF.run_command(["mkdir"m "./Duplicates/Waste"], PIPE, PIPE)
+    keep_path = './Duplicates/Keep'
+    waste_path = './Duplicates/Waste'
+    os.makedirs(keep_path)
+    os.makedirs(waste_path)
     instructions = \
     "In this folder are all duplicate files. Find the ones that you want to keep, just drag it into the folder called Keep. For all the ones that you want deleted, put them a folder called Waste. Once you have at least one file in the Keep folder, you can restart the program and use the move duplicates command and it will move all the files in the Keep folder to their correct folders. You can repeat this process as many times as you like. Also, when you are putting the files in the keep folder, you don't need to remove the _COPY extension, the program will do that automattically when they get moved into their folders."
-    with open("./Duplicates/instructions.txt") as instructions_file:
+    with open("./Duplicates/instructions.txt", "w") as instructions_file:
         instructions_file.write(instructions)
+    print("\nGo into the Duplicates folder and read the instructions.txt file to know what to do with the duplicates.", "yellow")    
+
+
+def manage_duplicate_folder(keep_remove):
+    """
+    This function moves the files in the keep filder and removes the files in the waste folder.
+    :param keep_remove: either Remove or Keep (answer with boolean)
+    :return: none
+    """
+    if keep_remove:
+        try:
+            org_file_names = os.listdir('./Duplicates/Keep')
+        except FileNotFoundError:
+            raise Exception("It seems as though the program has not been ran here before here. This is due to the fact that there is no folder called Duplicates/Keep.")
+        fixed_file_names = {}
+        for file in org_file_names:
+            if "copy" in file:
+                file_name_str = str(file)
+                copy_index = file_name_str.rindex('copy')
+                dot_index = file_name_str.rindex('.')
+                curly_bracket_index = file_name_str.rindex('(')
+                file_extension = file_name_str[dot_index+1:]
+                file_name = file_name_str[:curly_bracket_index]
+                new_file_name = file_name + '.'+file_extension
+                if new_file_name in fixed_file_names:
+                    copies = 0
+                    while True:
+                        copies += 1
+                        copy_file_name = file_name + str(copies) + '.'+file_extension
+                        if copy_file_name in fixed_file_names:
+                            continue
+                        else:
+                            fixed_file_names[file_name] = copy_file_name
+                else:
+                    fixed_file_names[file] = new_file_name
+        for org_name in fixed_file_names.keys():
+            for copy_file_name in fixed_file_names.values():
+                    org_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/keep/'+ org_name
+                    print('orgpath: '+org_path)
+                    new_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/keep/'+ copy_file_name
+                    print('newpath: '+new_path)
+                    UF.run_command(["mv","org_path","new_path"], PIPE, PIPE)
+                    
+                    date_folder_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/keep/'+file_path_dates(UF.file_creation_date(new_path))
+                    UF.run_command(["mv","new_path","date_folder_path"], PIPE, PIPE)            
+        
+        num_of_files = len(fixed_file_names.values())
+        print("Moved " + str(num_of_files) + " files to their proper folders")
+        
+    else:
+        folder_name = 'Waste'
+        waste_file_names = os.listdir('./Duplicates/'+folder_name)
+        
+        if len(waste_file_names) == 0:
+            print('No files in Waste folder')
+
+        else:
+            for file_name in waste_file_names:
+                path = './Duplicates/'+folder_name+'/'+file_name
+                UF.run_command(["rm", path], PIPE, PIPE)
+        print("Removed " + str(len(waste_file_names)) + " files in the Remove folder")
+                
+# def put_files_in_folders(raw_exif_data):
+#     pass
+
+def file_path_dates(input_date):
+    if len(input_date) == 3:
+        month = input_date[0]
+        day = int(input_date[1])
+        year = int(input_date[2])
+        if day in (1, 21, 31):
+            new_day = str(day) + "st"
+        elif day in (2, 22):
+            new_day = str(day) + "nd"
+        elif day == 23:
+            new_day = str(day) + "rd"
+        else:
+            new_day = str(day) + "th"
+        final_string = "./" + str(year) + "/" + str(month) + "/" + str(month) + "-" + str(new_day)
+        return final_string 
+
+# setup_duplicate_folder()
+manage_duplicate_folder(True)
+
+
+        
