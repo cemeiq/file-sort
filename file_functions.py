@@ -29,3 +29,5 @@ def list_file_paths(extensions,sub_folders):
 					if file.endswith(extension):
 						files.append(file)
 	return files
+
+# print(list_file_paths(['.pdf'], True))
