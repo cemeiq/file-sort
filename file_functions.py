@@ -1,38 +1,31 @@
-import utility_functions
+import utility_functions as UF
 import os
 import sys
+from subprocess import PIPE
 
 def list_file_paths(extensions,sub_folders):
 	"""
 	Function to list the files in the current direcotires and sub direcotires.
 	pararmeter sub_folders so that we can go to subfolder instead of the CWD
 	"""
-	files=[]#list storing the file paths
+	# files list containing all the file paths
+	files = [] 
 	if sub_folders:
 		for file_type in extensions:
-			command=['find','.','iname','*','extension']
-			command_input=utility_functions.run_command(command,'PIPE','PIPE')
-			command_out=utility_functions.subprocess_output(command_input)
+			command = ['find', '.', '-iname', '*' + file_type + '']
+			command_input = UF.run_command(command, PIPE, PIPE)
+			command_out = UF.subprocess_output(command_input)
 			if "\\n" in command_out:
-				command_out=command_out.split("\\n")
+				command_out = command_out.split("\\n")
 				for file in command_out:
 					if file !='':
-						file.append(file.strip("\\n"))
-			else:
-				if command_out !='':
-					files.append(command_out)
-	else:
-		for file_type in extensions:
-			command=['find','-','maxdepth','1','.','iname','*','extension', ]
-			command_input=utility_functions.run_command(command,PIPE,PIPE)
-			command_out=utility_functions.subprocess_output(command_input)
-			if "\\n" in command_out:
-				command_out=command_out.split("\\n")
-				for file in command_out:
-					if file !='':
-						file.append(file.strip("\\n"))
-			else:
-				if command_out !='':
-					files.append(command_out)
+						files.append(file.strip("\\n"))
+			elif command_out !='':
+				files.append(command_out)
+
+	else:					
+		for extension in extensions:
+				for file in os.listdir("."):
+					if file.endswith(extension):
+						files.append(file)
 	return files
-print(list_file_paths('.txt',True))
