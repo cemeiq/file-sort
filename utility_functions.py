@@ -36,8 +36,9 @@ def file_creation_date(file_path):
     # command_output = subprocess_output(subprocess_command_output).strip("\\n")
     # elements = command_output.split(" ")
     # print(elements)
-
+    print(file_path)
     date = subprocess_output(run_command(["stat", file_path], PIPE, PIPE)).strip('\\n').split(" ")[-5]
+
     year = date[:4]
     month = date[5:7]
     day = date[8:11]
@@ -47,4 +48,5 @@ def file_creation_date(file_path):
 
 # print(file_creation_date('/home/iqra/Documents/python-projects/file-sort/sorter.py'))
 # print(subprocess_output(run_command(["stat", '/home/iqra/Documents/python-projects/file-sort/sorter.py'], PIPE, PIPE)).strip('\\n').split(" ")[-5])
-print(file_creation_date('/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/2020_Book_ArtificialIntelligenceXXXVII (4th copy).pdf')[0])
+# print(file_creation_date('/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/2020_Book_ArtificialIntelligenceXXXVII (4th copy).pdf')[0])
+# print(subprocess_output(run_command(['find', '.', '-iname', '*' + '.pdf' + ''], PIPE, PIPE)))

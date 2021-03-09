@@ -34,8 +34,13 @@ def manage_duplicate_folder(keep_remove):
         except FileNotFoundError:
             raise Exception("It seems as though the program has not been ran here before here. This is due to the fact that there is no folder called Duplicates/Keep.")
         fixed_file_names = {}
+        print(org_file_names)
         for file in org_file_names:
-            if "copy" in file:
+            if ("copy" in file) == False:
+                fixed_file_names.setdefault(file,[]).append(0)     
+                print(0)
+            elif "copy" in file:
+                print(file)
                 file_name_str = str(file)
                 copy_index = file_name_str.rindex('copy')
                 dot_index = file_name_str.rindex('.')
@@ -43,30 +48,85 @@ def manage_duplicate_folder(keep_remove):
                 file_extension = file_name_str[dot_index+1:]
                 file_name = file_name_str[:curly_bracket_index]
                 new_file_name = file_name + '.'+file_extension
-                if new_file_name in fixed_file_names:
-                    copies = 0
-                    while True:
-                        copies += 1
-                        copy_file_name = file_name + str(copies) + '.'+file_extension
-                        if copy_file_name in fixed_file_names:
-                            continue
-                        else:
-                            fixed_file_names[file_name] = copy_file_name
-                else:
-                    fixed_file_names[file] = new_file_name
-        for org_name in fixed_file_names.keys():
-            for copy_file_name in fixed_file_names.values():
-                    org_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/keep/'+ org_name
-                    print('orgpath: '+org_path)
-                    new_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/keep/'+ copy_file_name
-                    print('newpath: '+new_path)
-                    UF.run_command(["mv","org_path","new_path"], PIPE, PIPE)
-                    
-                    date_folder_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/keep/'+file_path_dates(UF.file_creation_date(new_path))
-                    UF.run_command(["mv","new_path","date_folder_path"], PIPE, PIPE)            
+                
+                new_file_name = new_file_name.replace(" ", "")
+                # print(new_file_name)
+                
+
+                # if new_file_name in org_file_names:    
+                #     fixed_file_names.setdefault(new_file_name,[]).append(file_name_str)
+       
+                # # print(fixed_file_names)     
+                # # print(file)          
+                # else:
+                fixed_file_names.setdefault(new_file_name,[]).append(file_name_str)
+        print(fixed_file_names)
+        updated_dict = {}
         
-        num_of_files = len(fixed_file_names.values())
-        print("Moved " + str(num_of_files) + " files to their proper folders")
+        for key, value in fixed_file_names.items():
+            copies = 0
+            for item in value:
+                if (item !=0):
+                    print(item)
+                    copies+=1
+                    file_name_str = str(item)
+                    copy_index = file_name_str.rindex('copy')
+                    dot_index = file_name_str.rindex('.')
+                    curly_bracket_index = file_name_str.rindex('(')
+                    file_extension = file_name_str[dot_index+1:]
+                    file_name = file_name_str[:curly_bracket_index]
+                    new_file_name = file_name + '.'+file_extension
+                    
+                    new_file_name = new_file_name.replace(" ", "")
+                    
+
+                    copy_file_item = str(file_name) + str(copies) + '.'+file_extension
+                    copy_file_item = copy_file_item.replace(" ", "")
+
+                    org_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+ file_name_str
+                    print('orgpath: '+org_path)
+                    new_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+ copy_file_item
+                    print('newpath: '+new_path)
+                    UF.run_command(["mv",org_path,new_path], PIPE, PIPE)
+                    updated_dict.setdefault(key,[]).append(copy_file_item)
+                    date_folder_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+file_path_dates(UF.file_creation_date(new_path))
+                    UF.run_command(["mkdir","-p",date_folder_path], PIPE, PIPE)
+                    UF.run_command(["mv",new_path,date_folder_path], PIPE, PIPE) 
+                else:
+                    print(key)
+                    new_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+ str(key)
+                    date_folder_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+file_path_dates(UF.file_creation_date(new_path))
+                    UF.run_command(["mkdir","-p",date_folder_path], PIPE, PIPE)
+                    UF.run_command(["mv",new_path,date_folder_path], PIPE, PIPE)               
+
+        # print(updated_dict)         
+        # for x, y in fixed_file_names.items():
+            
+            #             copies = 0
+            # while True:
+            #     copies += 1
+            #     copy_file_name = str(y) + str(copies) + '.'+file_extension
+            #     print(copy_file_name)
+            #     if copy_file_name in fixed_file_names:
+            #             continue
+            #     else:
+            #             fixed_file_names[x] = copy_file_name
+
+        # print(fixed_file_names)                 
+                
+        # for org_file_name, copies in updated_dict.items():
+        #     for copy_file_name in copies:
+        #             org_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+ org_file_name
+        #             print('orgpath: '+org_path)
+        #             new_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+ copy_file_name
+        #             print('newpath: '+new_path)
+        #             UF.run_command(["mv",org_path,new_path], PIPE, PIPE)
+        #             # date_folder_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+file_path_dates(UF.file_creation_date(new_path))
+                    # UF.run_command(["mkdir","-p",date_folder_path], PIPE, PIPE)
+                    # UF.run_command(["mv",new_path,date_folder_path], PIPE, PIPE)            
+        
+        # num_of_files = len(fixed_file_names.values())
+        # print("Moved " + str(num_of_files) + " files to their proper folders")
         
     else:
         folder_name = 'Waste'
@@ -97,11 +157,24 @@ def file_path_dates(input_date):
             new_day = str(day) + "rd"
         else:
             new_day = str(day) + "th"
-        final_string = "./" + str(year) + "/" + str(month) + "/" + str(month) + "-" + str(new_day)
+        final_string =  str(year) + "/" + str(month) + "/" + str(month) + "-" + str(new_day)
         return final_string 
 
-# setup_duplicate_folder()
+# # setup_duplicate_folder()
 manage_duplicate_folder(True)
+# new_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+ '2020_Book_ArtificialIntelligenceXXXVII.pdf'
+# date_folder_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+file_path_dates(UF.file_creation_date(new_path))
+# UF.run_command(["mkdir","-p",date_folder_path], PIPE, PIPE)
+# UF.run_command(["mv",new_path,date_folder_path], PIPE, PIPE) 
+                
+# org_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/2020_Book_ArtificialIntelligenceXXXVII (3rd copy).pdf'
+# new_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/2020_Book_ArtificialIntelligenceXXXVII.pdf'
+# UF.run_command(["mv",org_path,new_path], PIPE, PIPE)
 
-
+# new_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/2020_Book_ArtificialIntelligenceXXXVII (copy).pdf'        
+# date_folder_path = '/home/iqra/Documents/python-projects/file-sort/Duplicates/Keep/'+file_path_dates(UF.file_creation_date(new_path))
+# # print(date_folder_path)
+# print(date_folder_path)
+# UF.run_command(["mkdir","-p",date_folder_path], PIPE, PIPE)
+# UF.run_command(["mv",new_path,date_folder_path], PIPE, PIPE)            
         
